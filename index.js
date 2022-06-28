@@ -1,20 +1,25 @@
-const AdminJS = require('adminjs');
-const AdminJSExpress = require('@adminjs/express');
-const AdminJSMongoose = require('@adminjs/mongoose');
-const express = require('express');
-const app = express();
-const port = 3000;
-
+import AdminJS from 'adminjs';
+import AdminJSExpress from '@adminjs/express';
+import AdminJSMongoose from '@adminjs/mongoose';
+import express from 'express';
+import 'dotenv/config';
+import mongoose from 'mongoose';
 AdminJS.registerAdapter(AdminJSMongoose);
+import Owner from './models/ownerModel.js';
 
-const adminJS = new AdminJS({
-  databases: [],
+const port = 3000;
+const DB = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB}.lnump.mongodb.net/?retryWrites=true&w=majority}`;
+mongoose.connect(DB);
+
+const app = express();
+const adminJs = new AdminJS({
   rootPath: '/admin',
+  resources: [Owner],
 });
 
-const router = AdminJSExpress.buildRouter(adminJS);
+const router = AdminJSExpress.buildRouter(adminJs);
 
-app.use(adminJS.options.rootPath, router);
+app.use(adminJs.options.rootPath, router);
 app.get('/', (req, res) => {
   res.send('hello world');
 });
